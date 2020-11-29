@@ -141,7 +141,7 @@ document.getElementById('screenShot').addEventListener('click',()=>{
     html2canvas(document.getElementById('myMap'),{
         onrendered: function(canvas){
         //imgタグのsrcの中に、html2canvasがレンダリングした画像を指定する。
-        var imgData = canvas.toDataURL("image/png");
+        var imgData = canvas.toDataURL();
         // document.getElementById("result").src = imgData;
         document.getElementById("result").innerText = imgData;
         }
