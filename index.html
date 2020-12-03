@@ -7,7 +7,10 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>親に現在地を送る</h1>
+    <h1>HTML5カメラ</h1>
+
+    <div style="background-color : #AAEEDD"><h1>JavaScriptで撮るスクリーンショット</h1></div>
+    <!-- <div id="view"></div> -->
     <div id='printoutPanel'></div>
         <div id="myMap"></div>
 
@@ -20,25 +23,33 @@
     <video id="camera" width="300" height="200"></video>
     <canvas id="picture" width="300" height="200"></canvas>
     <form>
-        <button type="button" class="button" id="shutter">シャッター</button>
+        <button type="button" id="shutter">シャッター</button>
     </form>
 
     <form>
-        <button type="button" class="button" id="save" onclick="getBase64();">写真を保存</button>
+        <button type="button" id="save" onclick="getBase64();">写真を保存</button>
         <div id="saveArea"></div>
     </form>
 
     <form>
-        <button type="button" class="button" id="send" onclick="sendMail();">メールを送る</button>
+        <button type="button" id="send" onclick="sendMail();">メールを送る</button>
         <div id="mailArea"></div>
     </form>
+    <!-- <form>
+        <button type="button" id="screenShot">地図を保存</button>
+    </form> -->
+
+
+    <!-- <button onclick="signIn()">Sign in</button>
+    <button onclick="sendEmail()">Send email</button>
+    <button onclick="signOut()">Sign out</button> -->
 
 <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase.js"></script>
 <script src="js/main.js"></script>
 <script>getMap();</script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-<script src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AuTJvl_LshzcyKsjCmNR_f2PiEfaNsBMChyKfqkbnRV18OKvSKu4YS2X1m7DdJ32' async defer></script>
+<script src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=' async defer></script>
 <script src="js/BmapQuery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
 <script>snapShot();</script>
