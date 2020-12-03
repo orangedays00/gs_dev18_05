@@ -1,5 +1,5 @@
 var firebaseConfig = {
-    apiKey: "AIzaSyBCTFrZlmJNMjLnjyAdqdM0RtSPlkFggpk",
+    apiKey: "",
     authDomain: "dev18-map.firebaseapp.com",
     databaseURL: "https://dev18-map.firebaseio.com",
     projectId: "dev18-map",
