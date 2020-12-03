@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,17 @@
 <body>
     <h1>HTML5カメラ</h1>
 
+    <div style="background-color : #AAEEDD"><h1>JavaScriptで撮るスクリーンショット</h1></div>
+    <!-- <div id="view"></div> -->
+    <div id='printoutPanel'></div>
+        <div id="myMap"></div>
+
+    <h3>↓↓ここから画像↓↓　（上の対象のDIVを画像化）<h3>
+        <!-- <img src="" id="result" /> -->
+        <div id="result"></div>
+    <h3>↑↑ここまで画像↑↑</h3>
+
+    <hr>
     <video id="camera" width="300" height="200"></video>
     <canvas id="picture" width="300" height="200"></canvas>
     <form>
@@ -19,22 +30,22 @@
         <button type="button" id="save" onclick="getBase64();">写真を保存</button>
         <div id="saveArea"></div>
     </form>
+
     <form>
-        <button type="button" id="screenShot">地図を保存</button>
+        <button type="button" id="send" onclick="sendMail();">メールを送る</button>
+        <div id="mailArea"></div>
     </form>
+    <!-- <form>
+        <button type="button" id="screenShot">地図を保存</button>
+    </form> -->
 
-    <hr>
-    <div style="background-color : #AAEEDD"><h1>JavaScriptで撮るスクリーンショット</h1></div>
-    <div id="view"></div>
-        <div id="myMap"></div>
 
-    <h3>↓↓ここから画像↓↓　（上の対象のDIVを画像化）<h3>
-        <!-- <img src="" id="result" /> -->
-        <div id="result"></div>
-    <h3>↑↑ここまで画像↑↑</h3>
+    <!-- <button onclick="signIn()">Sign in</button>
+    <button onclick="sendEmail()">Send email</button>
+    <button onclick="signOut()">Sign out</button> -->
 
-    <hr>
-
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase.js"></script>
 <script src="js/main.js"></script>
 <script>getMap();</script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -42,5 +53,13 @@
 <script src="js/BmapQuery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
 <script>snapShot();</script>
+<script src="https://apis.google.com/js/client.js?onload=onLoad"></script>
+
 </body>
 </html>
+
+<!-- クライアントID
+562545842346-eo5c01nf567em1otdiqn7ctgqnrearl6.apps.googleusercontent.com
+
+シークレット
+Q4VqoDv-R0affitjs9E16-ll -->
