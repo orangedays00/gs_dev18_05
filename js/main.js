@@ -1,5 +1,5 @@
 var firebaseConfig = {
-    apiKey: "",
+    apiKey: "AIzaSyBCTFrZlmJNMjLnjyAdqdM0RtSPlkFggpk",
     authDomain: "dev18-map.firebaseapp.com",
     databaseURL: "https://dev18-map.firebaseio.com",
     projectId: "dev18-map",
@@ -65,8 +65,6 @@ const newPostRef = firebase.database().ref();
 
 
                   } },
-                // { label: 'Handler2', eventHandler: function () { alert('Handler2'); } },
-                // { label: 'Handler3', eventHandler: function () { alert('Handler3'); } }
             ]
         });
         infobox.setMap(map);
@@ -106,17 +104,11 @@ const newPostRef = firebase.database().ref();
         navigator.geolocation.getCurrentPosition(mapsInit, mapsError, set);
     }
 
-    // document.getElementById('LocateMeButton').addEventListener('click',()=>{
-    //     navigator.geolocation.getCurrentPosition(mapsInit, mapsError, set);
-    //     const latDev = position.coords.latitude;
-    //     const lonDev = position.coords.longitude;
-    //     console.log(latDev);
-    //     console.log(lonDev);
-    // })
-
 // ------------------
 // 写真設定
+// 参考 https://blog.katsubemakito.net/html5/camera1
 // ------------------
+
 const snapShot = () => {
     const video  = document.querySelector("#camera");
     const canvas = document.querySelector("#picture");
@@ -211,11 +203,13 @@ function sendMail(){
         let key = data.key;
         fetch("https://rapidprod-sendgrid-v1.p.rapidapi.com/mail/send", {
             "method": "POST",
+            "mode": "cors",
             "headers": {
                 "x-rapidapi-host": "rapidprod-sendgrid-v1.p.rapidapi.com",
-                "x-rapidapi-key": "",
+                "x-rapidapi-key": "2c945c3dc7msh925e8e18da683ecp18839bjsnbea8973f7c5b",
                 "content-type": "application/json",
-                "accept": "application/json"
+                "accept": "application/json",
+                "Access-Control-Allow-Origin": "https://orangedays00.github.io/"
             },
             "body": {
                 "personalizations": [
