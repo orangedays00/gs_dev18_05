@@ -1,250 +1,238 @@
-var firebaseConfig = {
-    apiKey: "",
-    authDomain: "dev18-map.firebaseapp.com",
-    databaseURL: "https://dev18-map.firebaseio.com",
-    projectId: "dev18-map",
-    storageBucket: "dev18-map.appspot.com",
-    messagingSenderId: "261842475959",
-    appId: "1:261842475959:web:9d6005e5990988be3ba632"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-
-//firebaseのデーターベース（保存させる場所）を使いますよと言うjsのコードを貼り付ける
-// xxxxxスクリプトを貼り付ける
-const newPostRef = firebase.database().ref();
-
-
-
-//****************************************
-// 地図取得
-//****************************************
-
-    //****************************************
-    //成功関数
-    //****************************************
-    let map;
-
-    function mapsInit(position) {
-      //lat=緯度、lon=経度 を取得
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        console.log(lat);
-        console.log(lon);
-
-        //Map表示
-        // map = new Bmap("#myMap");
-        // map.startMap(lat, lon, "load", 20); //The place is Bellevue.
-        // //Pinを追加
-        // let pin = map.pin(lat, lon, "#ff0000");
-        // //Infoboxを追加
-        // map.infobox(lat, lon, "タイトル", "詳細情報を記載");
-        var map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
-            /* No need to set credentials if already passed in URL */
-            center: new Microsoft.Maps.Location(lat, lon)
-        });
-        map.setOptions({
-            maxZoom: 18,
-            minZoom: 18
-        });
-        var infobox = new Microsoft.Maps.Infobox(map.getCenter(), {
-            title: '今いる場所',
-            description: '到着したら、ボタンをクリック',
-            actions: [
-                { label: '地図を保存',
-                eventHandler: function(){
-                    navigator.geolocation.getCurrentPosition(mapsInit, mapsError, set);
-                    const latDev = position.coords.latitude;
-                    const lonDev = position.coords.longitude;
-                    
-                    newPostRef.push({
-                        lat:latDev,
-                        lon:lonDev,
-                        snapShot:""
-                    });
-
-
-                  } },
-                // { label: 'Handler2', eventHandler: function () { alert('Handler2'); } },
-                // { label: 'Handler3', eventHandler: function () { alert('Handler3'); } }
-            ]
-        });
-        infobox.setMap(map);
-        
-    };
-
-
-    //****************************************
-    //失敗関数
-    //****************************************
-    function mapsError(error) {
-        let e = "";
-        if (error.code == 1) { //1＝位置情報取得が許可されてない（ブラウザの設定）
-        e = "位置情報が許可されてません";
-        }
-        if (error.code == 2) { //2＝現在地を特定できない
-        e = "現在位置を特定できません";
-        }
-        if (error.code == 3) { //3＝位置情報を取得する前にタイムアウトになった場合
-        e = "位置情報を取得する前にタイムアウトになりました";
-        }
-        alert("エラー：" + e);
-    };
-
-    //****************************************
-    //オプション設定
-    //****************************************
-    const set = {
-        enableHighAccuracy: true, //より高精度な位置を求める
-        maximumAge: 20000, //最後の現在地情報取得が20秒以内であればその情報を再利用する設定
-        timeout: 10000 //10秒以内に現在地情報を取得できなければ、処理を終了
-    };
-
-
-    //最初に実行する関数
-    const getMap = () => {
-        navigator.geolocation.getCurrentPosition(mapsInit, mapsError, set);
-    }
-
-    // document.getElementById('LocateMeButton').addEventListener('click',()=>{
-    //     navigator.geolocation.getCurrentPosition(mapsInit, mapsError, set);
-    //     const latDev = position.coords.latitude;
-    //     const lonDev = position.coords.longitude;
-    //     console.log(latDev);
-    //     console.log(lonDev);
-    // })
 
 // ------------------
-// 写真設定
+// 画像を呼び出し一覧化
 // ------------------
-const snapShot = () => {
-    const video  = document.querySelector("#camera");
-    const canvas = document.querySelector("#picture");
-    const se     = document.querySelector('#se');
 
-    /** カメラ設定 */
-    const constraints = {
-    audio: false,
-    video: {
-        width: 300,
-        height: 200,
-        facingMode: "user"   // フロントカメラを利用する
-        // facingMode: { exact: "environment" }  // リアカメラを利用する場合
-    }
-    };
+document.search.btn.addEventListener('click',(e)=>{
+    e.preventDefault();
 
-    /**
-     * カメラを<video>と同期
-     */
-    navigator.mediaDevices.getUserMedia(constraints)
-    .then( (stream) => {
-    video.srcObject = stream;
-    video.onloadedmetadata = (e) => {
-        video.play();
-    };
+    fetch(createUlr(document.search.key.value))
+    .then((data)=>{
+        return data.json();
     })
-    .catch( (err) => {
-    console.log(err.name + ": " + err.message);
-    });
-
-    /**
-     * シャッターボタン
-     */
-    document.querySelector("#shutter").addEventListener("click", () => {
-    const ctx = canvas.getContext("2d");
-
-        // 演出的な目的で一度映像を止めてSEを再生する
-        video.pause();  // 映像を停止
-        // se.play();      // シャッター音
-        setTimeout( () => {
-          video.play();    // 0.5秒後にカメラ再開
-        }, 500);
-
-        // canvasに画像を貼り付ける
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    });
-    };
-
-
-// --------------
-// 写真のスナップショットを保存
-// --------------
-    function dataKey(snap){
-        newPostRef.on("child_added", function (data) {
-            // 全てのデータを取得する。
-            let key =  data.key;
-            newPostRef.child(`${key}`).update({snapShot: `${snap}`});
-        });
-    }
-
-// 撮影した写真をデータ化する
-function getBase64(){
-    //img要素オブジェクトを取得する
-    var obj = document.getElementById("picture");
-
-    //canvas要素を生成してimg要素を反映する
-    var cvs = document.createElement('canvas');
-    cvs.width  = obj.width;
-    cvs.height = obj.height;
-    var ctx = cvs.getContext('2d');
-    ctx.drawImage(obj, 0, 0);
-
-    //canvas要素をBase64化する
-    var data = cvs.toDataURL("image/png");
-    dataKey(data);
-    // console.log(DataKey);
-
-    
-
-    //d1要素に書き出す
-    document.getElementById("saveArea").innerText = data;
-    }
-
-// -----------------------
-// メール送信
-// -----------------------
-function sendMail(){
-    newPostRef.on("child_added",function(data){
-        let lat = data.lat;
-        let lon = data.lon;
-        let snapShot = data.snapShot;
-        let key = data.key;
-        fetch("https://rapidprod-sendgrid-v1.p.rapidapi.com/mail/send", {
-            "method": "POST",
-            "headers": {
-                "x-rapidapi-host": "rapidprod-sendgrid-v1.p.rapidapi.com",
-                "x-rapidapi-key": "",
-                "content-type": "application/json",
-                "accept": "application/json"
-            },
-            "body": {
-                "personalizations": [
-                    {
-                        "to": [
-                            {
-                                "email": "orangedays8402@gmail.com"
-                            }
-                        ],
-                        "subject": `Hello, World!<br>${lat}<br>${lon}<br>${snapShot}`
-                    }
-                ],
-                "from": {
-                    "email": "orangeheart2010@gmail.com"
-                },
-                "content": [
-                    {
-                        "type": "text/plain",
-                        "value": "Hello, World!"
-                    }
-                ]
-            }
-        })
-        .then(response => {
-            console.log(response);
-            newPostRef.child(key).remove();
-        })
-        .catch(err => {
-            console.log(err);
-        });
+    .then((json)=>{
+        createImage(json);
     })
+});
+
+
+function createUlr(value){
+    const API_KEY = '19346952-383d9d626ea5d38ebed9ba67e';
+    let baseUrl = `https://pixabay.com/api/?key=${API_KEY}`;
+    let keyWord = `&q=${encodeURIComponent(value)}`;
+    let option = '&orientation=horizontal&per_page=40';
+    let mainUrl = `${baseUrl}${keyWord}${option}`;
+    return mainUrl;
 }
+
+function createImage(json){
+    let result = document.getElementById('result');
+
+    result.innerHTML = '';
+
+    if(json.totalHits > 0){
+        json.hits.forEach(value => {
+            let img = document.createElement('img');
+            img.classList.add('result-img');
+            img.setAttribute('onclick','setImage(this.src);');
+            let a = document.createElement('a');
+            a.href = value.pageURL;
+            a.setAttribute('target','_blank');
+            img.src = value.largeImageURL;
+            a.appendChild(img);
+            result.appendChild(a);
+        });
+    }else{
+        result.textContent = '該当する画像はありません。キーワードを変更して再度検索してください。';
+    }
+}
+
+// --------------
+// 画像解析
+// --------------
+
+// APIを利用する
+const KEY = '668461047943-m163ohl8qnf0lq0nrfbu37g9vaftgl3o.apps.googleusercontent.com';
+const GOOGLE_URL = 'https://vision.googleapis.com/v1/images:annotate?key=';
+const GOOGLE_API_URL = GOOGLE_URL + KEY;
+
+// ラベル検出用のテーブルを作成
+for(let i = 0;i<10;i++){
+    document.getElementById('resultBox').appendChild(document.createTextNode(`<tr><td class="resultTableContent"></td></tr>`));
+}
+
+// 画像の表示内容をクリアする
+function clear(){
+    if(document.querySelector('#textBox tr').length){
+        document.querySelector('#textBox tr').remove();
+    }
+    if(document.querySelector('#chartArea div').length){
+        document.querySelector('#chartArea div').remove();
+    }
+    document.querySelector('#resultBox tr td').textContent = "";
+}
+
+// 画像を選択した際に読み出す処理
+function setImage(evt){
+    getImageInfo(evt);
+    clear();
+    document.querySelector('.resultArea').removeClass('hidden');
+}
+
+// base64に変換
+// function toBase64Url(url, callback){
+//     var xhr = new XMLHttpRequest();
+//     xhr.onload = function() {
+//       var reader = new FileReader();
+//       reader.onloadend = function() {
+//         callback(reader.result);
+//       }
+//       reader.readAsDataURL(xhr.response);
+//     };
+//     xhr.open('GET', url);
+//     xhr.responseType = 'blob';
+//     xhr.send();
+//   }
+function ImageToBase64(img, mime_type) {
+    // New Canvas
+    var canvas = document.createElement('canvas');
+    canvas.width  = img.width;
+    canvas.height = img.height;
+    // Draw Image
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    // To Base64
+    return canvas.toDataURL(mime_type);
+    // let data  = canvas.toDataURL(mime_type);
+    // document.getElementById('test').innerText = data;
+}
+
+// 選択した画像を読み込み、APIに返すURLを生成する。
+function getImageInfo(evt){
+    console.log(evt);
+    let dataUrl = evt;
+    document.getElementById('showPic').innerHTML = `<img src="${dataUrl}" id="analysisImg">`;
+    console.log(dataUrl)
+    const ANALYSIS_IMG = document.getElementById('analysisImg');
+    // let base64Url = ImageToBase64(ANALYSIS_IMG,"image/jpg");
+    ImageToBase64(ANALYSIS_IMG,"image/jpg");
+    console.log(base64Url);
+    makeRequest(base64Url,getAPIInfo);
+}
+
+
+
+// APIへリクエストに組み込むJsonの組み立て
+function makeRequest(dataUrl,callback){
+    console.log(dataUrl);
+    let end = dataUrl.indexOf(',');
+    var request = "{'requests': [{'image': {'content': '" + dataUrl.slice(end + 1) + "'},'features': [{'type': 'LABEL_DETECTION','maxResults': 10,},{'type': 'FACE_DETECTION',},{'type':'TEXT_DETECTION','maxResults': 20,}]}]}";
+    callback(request)
+}
+
+
+// 通信を実施
+function getAPIInfo(request){
+    $.ajax({
+        url : api_url,
+        type : 'POST',
+        async : true,
+        cashe : false,
+        data: request,
+        dataType : 'json',
+        contentType: 'application/json',
+    }).done(function(result){
+        showResult(result);
+    }).fail(function(result){
+        alert('failed to load the info');
+    });
+}
+
+// 結果を描画
+function showResult(result){
+    //ラベル検出結果の表示
+    for (var i = 0; i < result.responses[0].labelAnnotations.length;i++){
+        $("#resultBox tr:eq(" + i + ") td").text(result.responses[0].labelAnnotations[i].description)
+    }
+    //表情分析の結果の表示
+    if(result.responses[0].faceAnnotations){
+        //この変数に、表情のlikelihoodの値を配列として保持する
+        var facialExpression = [];
+        facialExpression.push(result.responses[0].faceAnnotations[0].joyLikelihood);
+        facialExpression.push(result.responses[0].faceAnnotations[0].sorrowLikelihood);
+        facialExpression.push(result.responses[0].faceAnnotations[0].angerLikelihood);
+        facialExpression.push(result.responses[0].faceAnnotations[0].surpriseLikelihood);
+        facialExpression.push(result.responses[0].faceAnnotations[0].headwearLikelihood);
+        for (var k = 0; k < facialExpression.length; k++){
+            if (facialExpression[k] == 'UNKNOWN'){
+                facialExpression[k] = 0;
+            }else if (facialExpression[k] == 'VERY_UNLIKELY'){
+                facialExpression[k] = 2;
+            }else if (facialExpression[k] == 'UNLIKELY'){
+                facialExpression[k] = 4;
+            }else if (facialExpression[k] == 'POSSIBLE'){
+                facialExpression[k] = 6;
+            }else if (facialExpression[k] == 'LIKELY'){
+                facialExpression[k] = 8;
+            }else if (facialExpression[k] == 'VERY_LIKELY'){
+                facialExpression[k] = 10;
+            }
+        }
+        //チャート描画の処理
+        $("#chartArea").highcharts({
+            chart: {
+                polar: true,
+                type: 'line'
+            },
+            title: {
+                text: 'Expression of a person',
+            },
+            pane: {
+                size: '80%'
+            },
+            xAxis: {
+                categories: ['joy', 'sorrow', 'anger', 'surprise','headwear'],
+                tickmarkPlacement: 'on',
+                lineWidth: 0
+            },
+            yAxis: {
+                gridLineInterpolation: 'polygon',
+                lineWidth: 0,
+                max:10,
+                min: 0
+            },
+            tooltip: {
+                shared: true,
+                pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:,.0f}</b><br/>'
+            },
+            series: [{
+                name: 'likelihood',
+                data: facialExpression,
+                pointPlacement: 'on'
+            }]
+        })
+    }else{
+        //表情に関する結果が得られなかった場合、表示欄にはその旨を記す文字列を表示
+        $("#chartArea").append("<div><b>No person can be found in the picture</b></div>");
+    }
+    //テキスト解読の結果を表示
+    if(result.responses[0].textAnnotations){
+        for (var j = 1; j < result.responses[0].textAnnotations.length; j++){
+            if(j < 16){
+                $("#textBox").append("<tr><td class='resultTableContent'>" + result.responses[0].textAnnotations[j].description + "</td></tr>")
+            }
+        }
+    }else{
+        //テキストに関する結果が得られなかった場合、表示欄にはその旨を記す文字列を表示
+        $("#textBox").append("<tr><td class='resultTableContent'><b>No text can be found in the picture</b></td></tr>")
+    }
+}
+
+// let url = 'https://pixabay.com/api/?key=19346952-383d9d626ea5d38ebed9ba67e';
+// fetch( url )
+// .then( function( data ) {
+//     return data.json();  //JSONデータとして取得
+// })
+// .then( function( json ) {
+//     console.log( json );
+// })
