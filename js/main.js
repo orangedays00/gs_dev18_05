@@ -17,7 +17,7 @@ document.search.btn.addEventListener('click',(e)=>{
 
 
 function createUlr(value){
-    const API_KEY = '19346952-383d9d626ea5d38ebed9ba67e';
+    const API_KEY = '';
     let baseUrl = `https://pixabay.com/api/?key=${API_KEY}`;
     let keyWord = `&q=${encodeURIComponent(value)}`;
     let option = '&orientation=horizontal&per_page=40';
@@ -52,7 +52,7 @@ function createImage(json){
 // --------------
 
 // APIを利用する
-const KEY = '668461047943-m163ohl8qnf0lq0nrfbu37g9vaftgl3o.apps.googleusercontent.com';
+const KEY = '';
 const GOOGLE_URL = 'https://vision.googleapis.com/v1/images:annotate?key=';
 const GOOGLE_API_URL = GOOGLE_URL + KEY;
 
