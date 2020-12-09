@@ -3,40 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1200万点の写真からお気に入りの写真を探そう</title>
+    <title>1200万点の写真から画像解析してみよう</title>
+    <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <h1>気になる画像を要素解析</h1>
-    <h2>まずはキーワード検索をしてください</h2>
+    <h2>画像検索</h2>
+    <div class="explain">まずは気になる画像をキーワード検索し、保存してください。</div>
     <form name="search">
         <input name="key" type="text" placeholder="文字を入力してください">
-        <input name="btn" type="submit" value="ボタン">
+        <input name="btn" type="submit" value="検索する">
     </form>
+    <div id="resultPager"></div>
     <div id="result"></div>
-    <h2>要素解析結果</h2>
+    <div class="under-line"></div>
+    <h2>画像解析</h2>
+    <!--- 画像をアップロードさせるためのボタンのあるエリア --->
+    <div class="explain">次に保存した画像をアップロードしてください。（JPEG または PNGファイルが利用可能です。）<input type="file" id="upLoader"></div>
     <div class="resultArea hidden">
-        <!--- アップロードされた画像を表示 --->
-        <div id="showPic"></div>
-        <div id="test"></div>
-        <!--- ラベル検出の結果を表示 --->
-        <table id="resultTable">
-            <thead><tr><td><b>This picture may be about...</b></td></tr></thead>
-            <tbody id="resultBox"></tbody>
-        </table>
+        <div class="upper-line"></div>
+        <h3>画像の解析結果</h3>
+        <!--- 選択した画像を表示 --->
+        <div class="resultArea-first">
+            <div class="resultArea-first--img">
+                <p class="common-margin">アップロードした画像</p>
+                <div id="upLoadImg"></div>
+            </div>
+            <!--- ラベル検出の結果を表示 --->
+            <table id="resultTable">
+                <thead><tr><td class="common-margin">画像の構成要素</td></tr></thead>
+                <tbody id="resultBox"></tbody>
+            </table>
+        </div>
     </div>
     <div class="resultArea hidden">
-        <!--- 人物の表情に関する結果をレーダーチャートで表示 --->
-        <div id="chartArea"></div>
-        <!--- テキスト解読の結果を表示 --->
-        <table id="textTable">
-            <thead><tr><td><b>This picture may contain following word(s)</b></td></tr></thead>
-            <tbody id="textBox"></tbody>
-        </table>
+        <div class="upper-line"></div>
+        <h3>感情の解析結果</h3>
+        <div class="resultArea-second">
+            <div class="resultArea-second--chart">
+                <!--- 人物の表情に関する結果をレーダーチャートで表示 --->
+                <div id="chartArea"></div>
+            </div>
+            <!--- テキスト解読の結果を表示 --->
+            <table id="textTable">
+                <thead><tr><td class="common-margin">この写真には次の単語が含まれている可能性があります</td></tr></thead>
+                <tbody id="textBox"></tbody>
+            </table>
+        </div>
     </div>
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="http://code.highcharts.com/highcharts.js"></script>
     <script src="http://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
+    <script src="js/pagination.min.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

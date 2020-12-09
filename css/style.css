@@ -1,7 +1,39 @@
-
 body {
     width: 1200px;
     margin: 0 auto;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 16px;
+    color: #333;
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin: 20px 0;
+    color: #fff;
+    background-color: #3f9200;
+    padding: 10px;
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.3rem;
+    margin: 20px 0;
+    height: 40px;
+    text-align: center;
+    background-color: #55c501;
+    font-weight: bold;
+    font-size: 18px;
+    color: white;
+    line-height: 40px;
+}
+
+h3 {
+    font-size: 1.2rem;
+    margin: 20px 0;
+}
+
+.explain {
+    margin: 10px;
 }
 
 form {
@@ -12,22 +44,32 @@ form input[type="text"] {
     width: 80%;
     border: none;
     outline: none;
-    padding: 5px 0;
+    padding: 5px 10px;
     font-size: 18px;
     font-weight: bold;
-    border-bottom: 1px solid #aaa;
+    border-bottom: 1px solid #999;
 }
 form input[type="submit"] {
     padding: 5px 10px;
-    border: 1px solid #aaa;
+    border: 1px solid #999;
     outline: none;
-    color: #000;
     background-color: #fff;
+    margin-left: 20px;
+    border-radius: 4px;
 }
 form input[type="submit"]:hover {
     color: #fff;
-    background-color: #aaa;
+    border: 1px solid #3f9200;
+    background-color: #3f9200;
     cursor: pointer;
+}
+
+input[type="file"]{
+    margin-left: 20px;
+}
+
+text {
+    font-size: 16px;
 }
 
 .result-img{
@@ -46,61 +88,132 @@ form input[type="submit"]:hover {
     padding: 30px;
 }
 
+/* --------------------------- */
 /* 要素解析結果表示エリアのCSS */
-/* ユーザのアップロードした画像に関する記述 */
-img{
+/* --------------------------- */
+
+.upper-line {
+    border-top: 1px solid #999;
+    padding-top: 10px;
+}
+
+.upLoadImg{
     max-height:300px;
-    max-width:480px;
     height:auto;
     width:auto;
 }
-.resultTableContent{
-    height:30px;
-    border: 3px solid #003A76;
-    border-radius: 4px;
-}
-#title{
-    height: 40px;
-    text-align: center;
-    background-color: #003A76;
-    font-weight: bold;
-    font-size: 18px;
-    color: white;
-    line-height: 40px;
-}
+
 .resultArea{
     width:1200px;
-    height:500px;
-    margin:0px auto;
+    height:900px;
+    margin:20px auto 50px;
     text-align: center;
 }
-#showPic{
-    border: 6px solid #003A76;
-    border-radius: 4px;
-    width:40%;
-    height:300px;
-    margin: 10px;
-    float:left;
+
+.resultArea-first, .resultArea-second {
+    display: flex;
 }
+
+.resultArea-first--img, .resultArea-second--chart {
+    width: 60%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+.resultArea-second--chart {
+    margin-top: 20px;
+}
+
+.common-margin {
+    padding: 10px;
+}
+
+#upLoadImg{
+    height:300px;
+    align-self: center;
+}
+
 #resultTable{
     width:40%;
-    float:right;
     margin: 10px;
 }
-#chartArea{
-    border: 6px solid #003A76;
+
+.resultTableContent{
+    height:30px;
+    border: 1px solid #999;
     border-radius: 4px;
-    width:40%;
+    padding: 5px 0;
+    line-height: 30px;
+}
+
+#chartArea{
+    border: 1px solid #999;
+    border-radius: 4px;
+    width:60%;
     height:300px;
-    margin: 10px;
-    float:left;
+    align-self: center;
 }
 #textTable{
     width:40%;
-    float:right;
     margin: 10px;
 }
+
 /* 初期状態では結果部分が表示されないようにするための記述 */
 .hidden{
     display: none;
+}
+
+/* --------------------- */
+/* ページネーションのCSS */
+/* --------------------- */
+
+#resultPager {
+    float: right;
+    margin-right: 100px;
+}
+
+.paginationjs-pages > ul > li > a {
+    padding: 6px 18px;
+    color: #333;
+    border: 1px solid #3f9200;
+}
+
+.paginationjs-pages > ul > li > a:hover {
+    color: #fff;
+    background-color: #3f9200;
+}
+
+.paginationjs-pages > ul > li.active > a {
+    color: #fff;
+    background-color: #55c501;
+    border: 1px solid #55c501;
+}
+
+.paginationjs-pages > ul > li.disabled > a {
+    color: #333;
+    background-color: #fff;
+}
+
+.paginationjs-prev {
+    margin: 0 16px 0 0;
+}
+
+.paginationjs-next {
+    margin: 0 0 0 16px;
+}
+
+.paginationjs-page {
+    margin: 0 4px;
+}
+
+.paginationjs-pages > ul {
+    display: flex;
+    align-items: baseline;
+}
+
+.paginationjs-pages > ul > li.paginationjs-ellipsis.disabled > a {
+    border: none;
+    color: black;
+    margin: 0 4px;
+    padding: 0;
 }

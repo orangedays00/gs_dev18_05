@@ -16,32 +16,43 @@ document.search.btn.addEventListener('click',(e)=>{
 });
 
 
+// PixabayのAPI呼び出し
 function createUlr(value){
     const API_KEY = '';
     let baseUrl = `https://pixabay.com/api/?key=${API_KEY}`;
     let keyWord = `&q=${encodeURIComponent(value)}`;
-    let option = '&orientation=horizontal&per_page=40';
+    let option = '&orientation=horizontal&per_page=200';
     let mainUrl = `${baseUrl}${keyWord}${option}`;
     return mainUrl;
 }
 
+// 取得した結果を画像一覧に描画
 function createImage(json){
     let result = document.getElementById('result');
 
     result.innerHTML = '';
 
+
     if(json.totalHits > 0){
-        json.hits.forEach(value => {
-            let img = document.createElement('img');
-            img.classList.add('result-img');
-            img.setAttribute('onclick','setImage(this.src);');
-            let a = document.createElement('a');
-            a.href = value.pageURL;
-            a.setAttribute('target','_blank');
-            img.src = value.largeImageURL;
-            a.appendChild(img);
-            result.appendChild(a);
+        // ページャーありの画像の生成方法
+        $(function() {
+            $('#resultPager').pagination({ // diary-all-pagerにページャーを埋め込む
+                dataSource: json.hits,
+                pageSize: 20, // 1ページあたりの表示数
+                prevText: '&lt; 前へ',
+                nextText: '次へ &gt;',
+                // ページがめくられた時に呼ばれる
+                callback: function(data, pagination) {
+                // dataの中に次に表示すべきデータが入っているので、html要素に変換
+                $('#result').html(template(data)); // diary-all-contentsにコンテンツを埋め込む
+                }
+            });
         });
+        function template(dataArray) {
+            return dataArray.map(function(data) {
+            return `<img src="${data.largeImageURL}" class="result-img">`
+            })
+        }
     }else{
         result.textContent = '該当する画像はありません。キーワードを変更して再度検索してください。';
     }
@@ -51,90 +62,78 @@ function createImage(json){
 // 画像解析
 // --------------
 
-// APIを利用する
+// Cloud Vision APIを利用する
 const KEY = '';
 const GOOGLE_URL = 'https://vision.googleapis.com/v1/images:annotate?key=';
 const GOOGLE_API_URL = GOOGLE_URL + KEY;
+console.log(GOOGLE_API_URL);
 
 // ラベル検出用のテーブルを作成
-for(let i = 0;i<10;i++){
-    document.getElementById('resultBox').appendChild(document.createTextNode(`<tr><td class="resultTableContent"></td></tr>`));
+for(let i = 0;i<20;i++){
+    let tr = document.createElement('tr');
+    let td = document.createElement('td');
+    td.classList.add('resultTableContent');
+    tr.appendChild(td);
+    document.getElementById('resultBox').appendChild(tr);
 }
 
 // 画像の表示内容をクリアする
 function clear(){
-    if(document.querySelector('#textBox tr').length){
-        document.querySelector('#textBox tr').remove();
+    if(document.querySelector('#textBox tr')){
+        document.querySelector('#textBox tr').innerHTML = "";
     }
-    if(document.querySelector('#chartArea div').length){
-        document.querySelector('#chartArea div').remove();
+    if(document.querySelector('#chartArea div')){
+        document.querySelector('#chartArea div').innerHTML = "";
     }
     document.querySelector('#resultBox tr td').textContent = "";
 }
 
+
+// -------------------
 // 画像を選択した際に読み出す処理
-function setImage(evt){
-    getImageInfo(evt);
-    clear();
-    document.querySelector('.resultArea').removeClass('hidden');
+// -------------------
+    document.getElementById("upLoader").onchange = function(event){
+        getImageInfo(event);
+        clear();
+        let resultArea = document.getElementsByClassName("resultArea");
+        for(let m = 0;m<resultArea.length;m++){
+            resultArea[m].classList.remove("hidden");
+        }
+    }
+
+// // ---------------
+// // 選択した画像を読み込み、APIに返すURLを生成する。
+// // ---------------
+
+function getImageInfo(event){
+    var file = event.target.files;
+    var reader = new FileReader();
+    var dataUrl = "";
+    reader.readAsDataURL(file[0]);
+    reader.onload = function(){
+        dataUrl = reader.result;
+        document.getElementById("upLoadImg").innerHTML = `<img src="${dataUrl}" class="upLoadImg">`;
+        makeRequest(dataUrl,getAPIInfo);
+    }
 }
 
-// base64に変換
-// function toBase64Url(url, callback){
-//     var xhr = new XMLHttpRequest();
-//     xhr.onload = function() {
-//       var reader = new FileReader();
-//       reader.onloadend = function() {
-//         callback(reader.result);
-//       }
-//       reader.readAsDataURL(xhr.response);
-//     };
-//     xhr.open('GET', url);
-//     xhr.responseType = 'blob';
-//     xhr.send();
-//   }
-function ImageToBase64(img, mime_type) {
-    // New Canvas
-    var canvas = document.createElement('canvas');
-    canvas.width  = img.width;
-    canvas.height = img.height;
-    // Draw Image
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-    // To Base64
-    return canvas.toDataURL(mime_type);
-    // let data  = canvas.toDataURL(mime_type);
-    // document.getElementById('test').innerText = data;
-}
-
-// 選択した画像を読み込み、APIに返すURLを生成する。
-function getImageInfo(evt){
-    console.log(evt);
-    let dataUrl = evt;
-    document.getElementById('showPic').innerHTML = `<img src="${dataUrl}" id="analysisImg">`;
-    console.log(dataUrl)
-    const ANALYSIS_IMG = document.getElementById('analysisImg');
-    // let base64Url = ImageToBase64(ANALYSIS_IMG,"image/jpg");
-    ImageToBase64(ANALYSIS_IMG,"image/jpg");
-    console.log(base64Url);
-    makeRequest(base64Url,getAPIInfo);
-}
-
-
-
+// -------------------
 // APIへリクエストに組み込むJsonの組み立て
+// -------------------
 function makeRequest(dataUrl,callback){
-    console.log(dataUrl);
+    // console.log(dataUrl);
     let end = dataUrl.indexOf(',');
-    var request = "{'requests': [{'image': {'content': '" + dataUrl.slice(end + 1) + "'},'features': [{'type': 'LABEL_DETECTION','maxResults': 10,},{'type': 'FACE_DETECTION',},{'type':'TEXT_DETECTION','maxResults': 20,}]}]}";
+    var request = "{'requests': [{'image':{'content': '" + dataUrl.slice(end + 1) + "'},'features': [{'type': 'LABEL_DETECTION','maxResults': 20,},{'type': 'FACE_DETECTION',},{'type':'TEXT_DETECTION','maxResults': 20,}]}]}";
+    // console.log(request)
     callback(request)
 }
 
-
+// -------------------
 // 通信を実施
+// -------------------
 function getAPIInfo(request){
     $.ajax({
-        url : api_url,
+        url : GOOGLE_API_URL,
         type : 'POST',
         async : true,
         cashe : false,
@@ -148,8 +147,11 @@ function getAPIInfo(request){
     });
 }
 
+// -------------------
 // 結果を描画
+// -------------------
 function showResult(result){
+    console.log(result);
     //ラベル検出結果の表示
     for (var i = 0; i < result.responses[0].labelAnnotations.length;i++){
         $("#resultBox tr:eq(" + i + ") td").text(result.responses[0].labelAnnotations[i].description)
@@ -163,6 +165,8 @@ function showResult(result){
         facialExpression.push(result.responses[0].faceAnnotations[0].angerLikelihood);
         facialExpression.push(result.responses[0].faceAnnotations[0].surpriseLikelihood);
         facialExpression.push(result.responses[0].faceAnnotations[0].headwearLikelihood);
+        facialExpression.push(result.responses[0].faceAnnotations[0].blurredLikelihood);
+        console.log(facialExpression);
         for (var k = 0; k < facialExpression.length; k++){
             if (facialExpression[k] == 'UNKNOWN'){
                 facialExpression[k] = 0;
@@ -185,15 +189,20 @@ function showResult(result){
                 type: 'line'
             },
             title: {
-                text: 'Expression of a person',
+                text: 'この画像を表すと...',
             },
             pane: {
                 size: '80%'
             },
             xAxis: {
-                categories: ['joy', 'sorrow', 'anger', 'surprise','headwear'],
+                categories: ['喜', '悲', '怒', '驚', '被', '不鮮明'],
                 tickmarkPlacement: 'on',
-                lineWidth: 0
+                lineWidth: 0,
+                labels: {
+                    style: {
+                        fontSize: '16px' // x軸の値の文字サイズ
+                    }
+                }
             },
             yAxis: {
                 gridLineInterpolation: 'polygon',
@@ -206,14 +215,18 @@ function showResult(result){
                 pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:,.0f}</b><br/>'
             },
             series: [{
-                name: 'likelihood',
+                name: 'line',
                 data: facialExpression,
                 pointPlacement: 'on'
             }]
         })
     }else{
         //表情に関する結果が得られなかった場合、表示欄にはその旨を記す文字列を表示
-        $("#chartArea").append("<div><b>No person can be found in the picture</b></div>");
+        const DIV = document.createElement('div');
+        const B = document.createElement('b');
+        B.textContent = "No person can be found in the picture";
+        DIV.appendChild(B);
+        document.getElementById('chartArea').appendChild(DIV);
     }
     //テキスト解読の結果を表示
     if(result.responses[0].textAnnotations){
@@ -223,16 +236,6 @@ function showResult(result){
             }
         }
     }else{
-        //テキストに関する結果が得られなかった場合、表示欄にはその旨を記す文字列を表示
         $("#textBox").append("<tr><td class='resultTableContent'><b>No text can be found in the picture</b></td></tr>")
     }
 }
-
-// let url = 'https://pixabay.com/api/?key=19346952-383d9d626ea5d38ebed9ba67e';
-// fetch( url )
-// .then( function( data ) {
-//     return data.json();  //JSONデータとして取得
-// })
-// .then( function( json ) {
-//     console.log( json );
-// })
